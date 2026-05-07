@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>중랑푸드마켓·뱅크센터 그냥드림 서비스 신청</title>
+<style>
+  :root {
+    --primary: #1a6b3c; --primary-light: #e8f5ee; --primary-mid: #2d8a52;
+    --accent: #f0a500; --text: #1c1c1e; --text-soft: #555;
+    --border: #d0d0d0; --bg: #f7f8f6; --white: #fff; --danger: #c0392b; --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+  .header { background: var(--primary); color: white; padding: 22px 20px 18px; text-align: center; }
+  .header .logo-line { font-size: 12px; letter-spacing: 1.5px; opacity: .75; margin-bottom: 6px; }
+  .header h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .header .sub { font-size: 12px; margin-top: 6px; opacity: .8; }
+  .steps-bar { display: flex; background: var(--primary-mid); }
+  .step-tab { flex: 1; text-align: center; padding: 10px 4px; font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.55); border-bottom: 3px solid transparent; line-height: 1.3; }
+  .step-tab.active { color: white; border-bottom-color: var(--accent); background: rgba(0,0,0,.12); }
+  .step-tab.done { color: rgba(255,255,255,0.75); }
+  .page { display: none; padding: 20px 16px 30px; max-width: 600px; margin: 0 auto; }
+  .page.active { display: block; }
+  .card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--primary); border-left: 3px solid var(--primary); padding-left: 8px; margin-bottom: 14px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+  .field label .req { color: var(--danger); margin-left: 2px; }
+  .field input { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 11px 13px; font-size: 15px; font-family: inherit; background: white; color: var(--text); -webkit-appearance: none; transition: border-color .2s; }
+  .field input:focus { outline: none; border-color: var(--primary); }
+  .radio-group { display: flex; gap: 10px; }
+  .radio-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; font-size: 14px; transition: all .2s; }
+  .radio-btn input { display: none; }
+  .radio-btn.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
+  .check-item input[type=checkbox] { display: none; }
+  .check-item .box { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .check-item.checked { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+  .check-item.checked .box { background: var(--primary); border-color: var(--primary); }
+  .check-item.checked .box::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+  .checklist-intro { font-size: 13px; color: var(--text-soft); background: #fff8e8; border-left: 3px solid var(--accent); padding: 10px 12px; border-radius: 0 8px 8px 0; margin-bottom: 14px; line-height: 1.5; }
+  .checklist-warn { font-size: 12.5px; font-weight: 700; color: var(--danger); margin-bottom: 12px; }
+  .cl-section-label { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 6px 10px; border-radius: 6px; margin: 10px 0 6px; }
+  .cl-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 10px; border: 1.5px solid var(--border); border-radius: 8px; margin-bottom: 7px; cursor: pointer; transition: all .2s; background: white; }
+  .cl-item .cl-box { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .cl-item .cl-text { font-size: 13.5px; line-height: 1.45; flex: 1; }
+  .cl-item.checked { border-color: var(--primary); background: var(--primary-light); }
+  .cl-item.checked .cl-box { background: var(--primary); border-color: var(--primary); }
+  .cl-item.checked .cl-box::after { content: '✓'; color: white; font-size: 13px; font-weight: 700; }
+  .cl-progress { text-align: right; font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 8px; }
+  .consent-box { background: #f9f9f9; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; color: var(--text-soft); max-height: 140px; overflow-y: auto; line-height: 1.6; margin-bottom: 12px; }
+  .consent-choice { display: flex; gap: 10px; }
+  .consent-btn { flex: 1; padding: 11px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; background: white; cursor: pointer; transition: all .2s; text-align: center; }
+  .consent-btn.agree { border-color: var(--primary); color: var(--primary); }
+  .consent-btn.agree.selected { background: var(--primary); color: white; }
+  .consent-btn.disagree.selected { background: #eee; border-color: #999; color: #666; }
+  .date-display { font-size: 14px; font-weight: 500; color: var(--primary); text-align: center; padding: 10px; background: var(--primary-light); border-radius: 8px; margin-bottom: 10px; }
+  /* 서명 미리보기 박스 */
+  .sig-preview-box { border: 2px dashed var(--border); border-radius: 8px; background: #fafafa; height: 110px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; cursor: pointer; flex-direction: column; gap: 6px; transition: border-color .2s; }
+  .sig-preview-box:active { border-color: var(--primary); background: var(--primary-light); }
+  .sig-preview-box img { max-height: 90px; max-width: 100%; border-radius: 4px; }
+  .sig-preview-box .ph-text { font-size: 13px; color: #bbb; }
+  .sig-preview-box .ph-icon { font-size: 28px; }
+  .sig-clear-btn { background: none; border: 1.5px solid var(--border); border-radius: 6px; padding: 7px 14px; font-family: inherit; font-size: 13px; cursor: pointer; color: var(--text-soft); margin-bottom: 12px; }
+  /* 전체화면 서명 모달 */
+  .sig-modal { display: none; position: fixed; inset: 0; background: white; z-index: 900; flex-direction: column; }
+  .sig-modal.open { display: flex; }
+  .sig-modal-header { background: var(--primary); color: white; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .sig-modal-header h2 { font-size: 16px; font-weight: 700; }
+  .sig-modal-header p { font-size: 12px; opacity: .8; margin-top: 2px; }
+  .sig-modal-canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; background: #f5f5f5; padding: 16px; }
+  .sig-modal-canvas-wrap canvas { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); display: block; }
+  .sig-modal-footer { padding: 14px 16px; display: flex; gap: 10px; background: white; border-top: 1px solid #eee; flex-shrink: 0; }
+  .sig-modal-btn { flex: 1; padding: 14px; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 700; border: none; cursor: pointer; }
+  .sig-modal-btn.erase { background: #f5f5f5; color: var(--text-soft); flex: 0 0 auto; padding: 14px 20px; }
+  .sig-modal-btn.cancel { background: white; border: 1.5px solid var(--border); color: var(--text-soft); }
+  .sig-modal-btn.confirm { background: var(--primary); color: white; }
+  /* 네비 버튼 */
+  .nav-row { display: flex; gap: 10px; margin-top: 6px; }
+  .btn { flex: 1; padding: 15px; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 700; border: none; cursor: pointer; transition: all .2s; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-secondary { background: white; color: var(--text-soft); border: 1.5px solid var(--border); flex: 0 0 auto; padding: 15px 20px; }
+  /* 로딩 */
+  .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 800; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+  .loading-overlay.show { display: flex; }
+  .spinner { width: 48px; height: 48px; border: 5px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: white; font-size: 15px; font-weight: 600; }
+  /* 완료 */
+  .complete-card { text-align: center; padding: 40px 20px; }
+  .complete-icon { font-size: 60px; margin-bottom: 16px; }
+  .complete-card h2 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+  .complete-card p { font-size: 14px; color: var(--text-soft); line-height: 1.7; }
+  .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 5px 12px; border-radius: 20px; margin: 8px 0; font-weight: 600; }
+  .status-badge.ok { background: #e8f5ee; color: var(--primary); }
+  .status-badge.fail { background: #fdecea; color: var(--danger); }
+  .print-preview { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+  .print-preview h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; text-align: center; color: var(--primary); }
+  .preview-row { display: flex; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed #eee; }
+  .preview-row:last-child { border-bottom: none; }
+  .preview-label { color: var(--text-soft); width: 105px; flex-shrink: 0; }
+  .preview-val { font-weight: 500; flex: 1; }
+  .btn-print { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+  .btn-reset { width: 100%; padding: 12px; background: white; color: var(--text-soft); border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 14px; cursor: pointer; }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: #333; color: white; padding: 12px 22px; border-radius: 30px; font-size: 13px; font-weight: 500; z-index: 999; transition: transform .3s; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  /* 출력용 양식 스타일 */
+  .print-form { font-family: '맑은 고딕', 'Malgun Gothic', sans-serif; font-size: 11px; }
+  .pf-doc { padding: 10px 0; }
+  .pf-title { font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 6px; }
+  .pf-outer { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  .pf-outer td { border: 1px solid #000; padding: 5px 8px; font-size: 11px; }
+  .pf-lbl { background: #f0f0f0; font-weight: 600; width: 90px; }
+  .pf-val { min-width: 80px; }
+  .pf-subtitle { font-size: 12px; font-weight: 700; text-align: center; background: #e8e8e8; }
+  .pf-desc { font-size: 10px; line-height: 1.5; }
+  .pf-notice-box { border: 1px solid #000; padding: 8px 10px; margin-bottom: 8px; font-size: 10.5px; line-height: 1.6; }
+  .pf-notice-title { font-weight: 700; margin-bottom: 4px; }
+  .pf-notice-item { margin-bottom: 4px; }
+  .pf-sign-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 4px; font-size: 11px; }
+  .pf-date { font-size: 13px; font-weight: 500; }
+  .pf-sign-row2 { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12px; }
+  .pf-sig-wrap { border-bottom: 1px solid #000; min-width: 120px; display: inline-flex; align-items: center; justify-content: center; }
+  .pf-sig-img { height: 45px; max-width: 120px; }
+  .pf-footer { text-align: right; font-size: 11px; font-weight: 600; margin-top: 6px; }
+  .pf-pagebreak { border-top: 2px dashed #ccc; margin: 16px 0; }
+  .pf-cl-intro { font-size: 10.5px; line-height: 1.6; margin-bottom: 8px; }
+  .pf-cl-warn { font-size: 11px; font-weight: 700; text-decoration: underline; margin-bottom: 8px; }
+  .pf-cl-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 10.5px; }
+  .pf-cl-table th { border: 1px solid #000; padding: 5px; background: #f0f0f0; font-weight: 700; text-align: center; }
+  .pf-cl-table td { border: 1px solid #000; padding: 5px 8px; vertical-align: middle; }
+  .pf-cl-cat { text-align: center; font-weight: 600; background: #f9f9f9; font-size: 10px; }
+  .pf-cl-chk { text-align: center; font-size: 14px; }
+  .pf-cl-bottom { font-size: 10.5px; line-height: 1.5; border: 1px solid #000; padding: 6px 8px; margin-bottom: 10px; }
+  .pf-cl-confirm { font-size: 12px; font-weight: 600; text-align: center; margin: 12px 0 8px; }
+  .preview-row { display: none; }
+  @media print {
+    .header, .steps-bar, .nav-row, .btn-print, .btn-reset, .complete-icon, .loading-overlay, .toast, .sig-modal, #submit-status, .print-preview h3 { display: none !important; }
+    .page { display: block !important; padding: 0; }
+    .card { box-shadow: none; border: none; }
+    body { background: white; }
+    .pf-pagebreak { page-break-after: always; border: none; }
+    .print-form { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">제출 중입니다... 잠시만 기다려 주세요</div>
+</div>
+
+<!-- 전체화면 서명 모달 -->
+<div class="sig-modal" id="sigModal">
+  <div class="sig-modal-header">
+    <div>
+      <h2 id="sigModalTitle">서명</h2>
+      <p>손가락으로 서명해 주세요</p>
+    </div>
+  </div>
+  <div class="sig-modal-canvas-wrap" id="sigModalWrap">
+    <canvas id="sigModalCanvas"></canvas>
+  </div>
+  <div class="sig-modal-footer">
+    <button class="sig-modal-btn erase" onclick="eraseModal()">지우기</button>
+    <button class="sig-modal-btn cancel" onclick="cancelModal()">취소</button>
+    <button class="sig-modal-btn confirm" onclick="confirmModal()">서명 완료 ✓</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="logo-line">중랑푸드마켓·뱅크센터</div>
+  <h1>그냥드림(먹거리 기본보장)<br>서비스 이용 신청</h1>
+  <div class="sub">기부식품등 제공사업 신청서</div>
+</div>
+
+<div class="steps-bar">
+  <div class="step-tab active" id="tab1" onclick="goTo(1)">①<br>개인정보</div>
+  <div class="step-tab" id="tab2" onclick="goTo(2)">②<br>자가점검</div>
+  <div class="step-tab" id="tab3" onclick="goTo(3)">③<br>동의</div>
+  <div class="step-tab" id="tab4" onclick="goTo(4)">④<br>서명·제출</div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <div class="card">
+    <div class="card-title">기본 정보 입력</div>
+    <div class="field"><label>성명 <span class="req">*</span></label><input type="text" id="name" placeholder="홍길동"></div>
+    <div class="field">
+      <label>성별 <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-btn" id="rb-m" onclick="selectGender('남')"><input type="radio" name="gender"> 남</label>
+        <label class="radio-btn" id="rb-f" onclick="selectGender('여')"><input type="radio" name="gender"> 여</label>
+      </div>
+    </div>
+    <div class="field"><label>주민등록번호 <span class="req">*</span></label><input type="text" id="idnum" placeholder="000000-0000000" inputmode="numeric" maxlength="14"></div>
+    <div class="field"><label>연락처 <span class="req">*</span></label><input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13"></div>
+    <div class="field"><label>주소 <span class="req">*</span></label><input type="text" id="address" placeholder="서울시 중랑구 ..."></div>
+  </div>
+  <div class="card">
+    <div class="card-title">이용자 구분 <span style="font-size:11px;color:#999;font-weight:400">(해당 항목 모두 선택)</span></div>
+    <div class="checkbox-grid" id="usertype-grid">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="거주불명등록자"><div class="box"></div><span>거주불명등록자</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="미등록 이주민"><div class="box"></div><span>미등록 이주민</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="신용불량자"><div class="box"></div><span>신용불량자</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="범죄피해자"><div class="box"></div><span>범죄피해자</span></div>
+      <div class="check-item" onclick="toggleCheck(this)" style="grid-column:span 2"><input type="checkbox" value="기타 식생활 취약계층"><div class="box"></div><span>기타 식생활 취약계층</span></div>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-primary" onclick="goTo(2)">다음 단계 →</button></div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <div class="card">
+    <div class="card-title">그냥드림 서비스 이용자 자가 점검 체크리스트</div>
+    <div class="checklist-intro">그냥드림 사업은 갑작스러운 위기 상황으로 식료품 지원이 절실히 필요한 이웃을 위해 운영됩니다. 원활한 사업 운영과 배고픔으로 고통받는 이웃을 위해 아래 항목을 스스로 점검해 주시기 바랍니다.</div>
+    <div class="checklist-warn">※ 아래 항목 중 어느 하나라도 해당하지 않을 경우, 서비스 이용이 제한됩니다.</div>
+    <div class="cl-section-label">이용자격 자가진단</div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">현재 실직, 휴업, 폐업, 주택 화재 등으로 인해 경제적 어려움을 겪고 계십니까?</div></div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">공공부조(기초생활보장, 긴급복지지원 등) 서비스를 받고 있지 않거나, 받고 있음에도 불구하고 생계가 곤란한 상태에 계십니까?</div></div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">당장 식료품이나 생필품을 구매할 여유가 없어 끼니를 거를 위기에 처해 있으십니까?</div></div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">본인이나 가구원 중에 돌봐야 할 가족(아동, 노인 등)의 식사가 시급한 상황입니까?</div></div>
+    <div class="cl-section-label">이용 에티켓</div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">나는 이 물품이 정부 예산과 민간 후원금으로 마련된 소중한 자산임을 인지하고 있습니까?</div></div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">나는 나보다 더 어려운 이웃이 물품을 가져가지 못할 수도 있다는 점을 알고 있습니까?</div></div>
+    <div class="cl-item" onclick="toggleCL(this)"><div class="cl-box"></div><div class="cl-text">나의 가족 구성원이 2주 이내에 그냥드림 물품을 수령한 사실이 없습니까?</div></div>
+    <div class="cl-progress" id="cl-progress">0 / 7 항목 확인됨</div>
+  </div>
+  <div class="card" style="background:#f9fdf9;border:1px solid #c3dfc8;">
+    <p style="font-size:13px;color:#444;line-height:1.6;">그냥드림 사업은 상황이 어려운 분을 위해 정부 재원과 민간의 후원으로 운영되고 있습니다. 주위의 어려운 분들이 우선 지원받을 수 있도록 적극 협조를 당부드립니다.</p>
+  </div>
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goTo(1)">← 이전</button>
+    <button class="btn btn-primary" onclick="goTo(3)">다음 단계 →</button>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <div class="card">
+    <div class="card-title">유의사항 확인</div>
+    <div style="font-size:13px;color:#444;line-height:1.7;">
+      <p style="margin-bottom:8px;">1. 기부식품등 제공사업자(푸드마켓, 푸드뱅크)로부터 제공받은 기부식품 또는 생활용품을 판매하거나 부정한 행위로 사용할 경우 기부식품등 제공이 중지될 수 있습니다.</p>
+      <p>2. 취식 전 반드시 소비기한 및 식품 상태를 확인하고 섭취하여야 한다.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">개인정보 수집 및 활용 동의</div>
+    <p style="font-size:12.5px;color:#666;margin-bottom:10px;line-height:1.6;"><strong>활용 목적:</strong> 식품기부 종합정보시스템(FMS) 구축·운영에 관한 사무에 활용<br><strong>보유기간:</strong> 최종 이용시점 이후 5년<br><strong>수집 항목:</strong> 인적사항(성명, 주소, 연락처) 및 가족관계에 관한 정보</p>
+    <div class="consent-choice" style="margin-bottom:4px;">
+      <button class="consent-btn agree" id="consent1-agree" onclick="setConsent(1,'agree')">동의함</button>
+      <button class="consent-btn disagree" id="consent1-disagree" onclick="setConsent(1,'disagree')">동의하지 않음</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">개인정보 제3자 제공 동의</div>
+    <div class="consent-box">
+      본 기관은 기부식품등 모집 및 제공을 위하여 수집한 개인정보를 다음과 같이 행정기관 등에 제공하고 있습니다.<br><br>
+      • 제공기관: 시·군·구 또는 읍·면·동 / 제공내용: 위 개인정보 수집 항목 상의 개인정보<br>
+      • 수집정보 활용: 기부식품등 제공에 관한 업무 및 기타 지방자치단체의 사회복지서비스 연계<br><br>
+      • 제공기관: 한국사회복지협의회 전국기부식품등지원센터 / 제공내용: 위 개인정보 수집 항목 상의 개인정보<br>
+      • 수집정보 활용: 식품기부 종합정보시스템(FMS) 구축·운영에 관한 사무에 활용<br><br>
+      귀하는 상기 내용에 관하여 개인정보 제공 동의를 거부할 권리가 있으며, 다만, 거부 시 기부식품등 제공사업 서비스 이용이 불가능할 수 있습니다.
+    </div>
+    <div class="consent-choice">
+      <button class="consent-btn agree" id="consent2-agree" onclick="setConsent(2,'agree')">동의함</button>
+      <button class="consent-btn disagree" id="consent2-disagree" onclick="setConsent(2,'disagree')">동의하지 않음</button>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goTo(2)">← 이전</button>
+    <button class="btn btn-primary" onclick="goTo(4)">다음 단계 →</button>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" id="page4">
+  <div class="card">
+    <div class="card-title">자가 점검 확인 서명</div>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:12px;">본인은 위 내용을 충분히 숙지하였으며, 양심에 따라 그냥드림 서비스를 이용할 것을 확인합니다.</p>
+    <div class="date-display" id="today-display"></div>
+    <div class="sig-preview-box" id="sigBox1" onclick="openModal(1)">
+      <div class="ph-icon">✍️</div>
+      <div class="ph-text">탭하여 서명하기</div>
+    </div>
+    <button class="sig-clear-btn" onclick="clearSig(1)">서명 지우기</button>
+  </div>
+  <div class="card">
+    <div class="card-title">신청서 서명</div>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:12px;">위와 같이 기부식품등 제공사업 지원을 신청합니다.</p>
+    <div class="sig-preview-box" id="sigBox2" onclick="openModal(2)">
+      <div class="ph-icon">✍️</div>
+      <div class="ph-text">탭하여 서명하기</div>
+    </div>
+    <button class="sig-clear-btn" onclick="clearSig(2)">서명 지우기</button>
+  </div>
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goTo(3)">← 이전</button>
+    <button class="btn btn-primary" onclick="submitForm()">📋 제출하기</button>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page" id="page5">
+  <div class="card complete-card">
+    <div class="complete-icon">✅</div>
+    <h2>신청이 완료되었습니다!</h2>
+    <div id="submit-status"></div>
+    <p>중랑푸드마켓·뱅크센터에서<br>확인 후 연락드리겠습니다.</p>
+  </div>
+  <div class="print-preview">
+    <h3>📄 신청 내용 (출력용)</h3>
+    <div id="summary-content"></div>
+  </div>
+  <button class="btn-print" onclick="window.print()">🖨️ 출력하기 (센터 보관용)</button>
+  <button class="btn-reset" onclick="resetForm()">새로운 신청서 작성</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// ★★★ 설정 ★★★
+// ══════════════════════════════════════
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwpLY2QWm8_UMXlO62xxJ3S_0xHMXKcU_STLY3EyHgm1vnl69Rnd_mXxyQCm4o4Izr7Fg/exec';
+const CENTER_EMAIL = 'jungnangfood@gmail.com';
+// ══════════════════════════════════════
+
+let currentPage = 1, gender = '';
+const consent = {1:'', 2:''};
+const sigData = {1: null, 2: null};
+let currentModalId = 0;
+let modalDrawing = false, mlx = 0, mly = 0;
+
+// 날짜
+function getTodayStr() {
+  const d = new Date();
+  return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+}
+document.getElementById('today-display').textContent = getTodayStr();
+
+// 페이지 이동
+function goTo(n) {
+  if (n > currentPage && !validatePage(currentPage)) return;
+  document.getElementById('page'+currentPage).classList.remove('active');
+  document.getElementById('tab'+currentPage).classList.remove('active');
+  if (currentPage < n) document.getElementById('tab'+currentPage).classList.add('done');
+  currentPage = n;
+  document.getElementById('page'+n).classList.add('active');
+  const tab = document.getElementById('tab'+n);
+  if (tab) { tab.classList.add('active'); tab.classList.remove('done'); }
+  window.scrollTo(0, 0);
+}
+
+// 유효성 검사
+function validatePage(p) {
+  if (p===1) {
+    if (!document.getElementById('name').value.trim()) { showToast('성명을 입력해 주세요'); return false; }
+    if (!gender) { showToast('성별을 선택해 주세요'); return false; }
+    if (!document.getElementById('idnum').value.trim()) { showToast('주민등록번호를 입력해 주세요'); return false; }
+    if (!document.getElementById('phone').value.trim()) { showToast('연락처를 입력해 주세요'); return false; }
+    if (!document.getElementById('address').value.trim()) { showToast('주소를 입력해 주세요'); return false; }
+  }
+  if (p===2) {
+    const c = document.querySelectorAll('.cl-item.checked').length;
+    if (c < 7) { showToast('체크리스트를 모두 확인해 주세요 ('+c+'/7)'); return false; }
+  }
+  if (p===3) {
+    if (!consent[1]) { showToast('개인정보 수집 동의를 선택해 주세요'); return false; }
+    if (!consent[2]) { showToast('개인정보 제3자 제공 동의를 선택해 주세요'); return false; }
+  }
+  if (p===4) {
+    if (!sigData[1]) { showToast('자가점검 확인 서명을 해주세요'); return false; }
+    if (!sigData[2]) { showToast('신청서 서명을 해주세요'); return false; }
+  }
+  return true;
+}
+
+function selectGender(v) {
+  gender = v;
+  document.getElementById('rb-m').classList.toggle('selected', v==='남');
+  document.getElementById('rb-f').classList.toggle('selected', v==='여');
+}
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.querySelector('input').checked = el.classList.contains('checked');
+}
+function toggleCL(el) {
+  el.classList.toggle('checked');
+  document.getElementById('cl-progress').textContent = document.querySelectorAll('.cl-item.checked').length + ' / 7 항목 확인됨';
+}
+function setConsent(n, v) {
+  consent[n] = v;
+  document.getElementById('consent'+n+'-agree').classList.toggle('selected', v==='agree');
+  document.getElementById('consent'+n+'-disagree').classList.toggle('selected', v==='disagree');
+}
+
+// ── 서명 모달 ──
+function openModal(id) {
+  currentModalId = id;
+  document.getElementById('sigModalTitle').textContent = id===1 ? '자가점검 확인 서명' : '신청서 서명';
+  document.getElementById('sigModal').classList.add('open');
+
+  setTimeout(function() {
+    const wrap = document.getElementById('sigModalWrap');
+    const canvas = document.getElementById('sigModalCanvas');
+    const w = wrap.offsetWidth - 32;
+    const h = wrap.offsetHeight - 32;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#111';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.clearRect(0, 0, w, h);
+
+    // 이전 서명 복원
+    if (sigData[id]) {
+      const img = new Image();
+      img.onload = function() { ctx.drawImage(img, 0, 0, w, h); };
+      img.src = sigData[id];
+    }
+
+    // 터치 이벤트
+    canvas.ontouchstart = function(e) {
+      e.preventDefault();
+      modalDrawing = true;
+      const r = canvas.getBoundingClientRect();
+      mlx = e.touches[0].clientX - r.left;
+      mly = e.touches[0].clientY - r.top;
+    };
+    canvas.ontouchmove = function(e) {
+      e.preventDefault();
+      if (!modalDrawing) return;
+      const r = canvas.getBoundingClientRect();
+      const x = e.touches[0].clientX - r.left;
+      const y = e.touches[0].clientY - r.top;
+      ctx.beginPath(); ctx.moveTo(mlx, mly); ctx.lineTo(x, y); ctx.stroke();
+      mlx = x; mly = y;
+    };
+    canvas.ontouchend = function(e) {
+      e.preventDefault();
+      modalDrawing = false;
+    };
+    // 마우스 이벤트 (PC)
+    canvas.onmousedown = function(e) {
+      modalDrawing = true;
+      const r = canvas.getBoundingClientRect();
+      mlx = e.clientX - r.left; mly = e.clientY - r.top;
+    };
+    canvas.onmousemove = function(e) {
+      if (!modalDrawing) return;
+      const r = canvas.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      ctx.beginPath(); ctx.moveTo(mlx, mly); ctx.lineTo(x, y); ctx.stroke();
+      mlx = x; mly = y;
+    };
+    canvas.onmouseup = function() { modalDrawing = false; };
+  }, 50);
+}
+
+function eraseModal() {
+  const canvas = document.getElementById('sigModalCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function cancelModal() {
+  document.getElementById('sigModal').classList.remove('open');
+}
+
+function confirmModal() {
+  const canvas = document.getElementById('sigModalCanvas');
+  // 서명 있는지 확인
+  const ctx = canvas.getContext('2d');
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let hasContent = false;
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] > 0) { hasContent = true; break; }
+  }
+  if (!hasContent) { showToast('서명을 먼저 해주세요'); return; }
+
+  sigData[currentModalId] = canvas.toDataURL('image/png');
+
+  // 미리보기 업데이트
+  const box = document.getElementById('sigBox'+currentModalId);
+  box.innerHTML = '<img src="'+sigData[currentModalId]+'">';
+
+  document.getElementById('sigModal').classList.remove('open');
+}
+
+function clearSig(id) {
+  sigData[id] = null;
+  const box = document.getElementById('sigBox'+id);
+  box.innerHTML = '<div class="ph-icon">✍️</div><div class="ph-text">탭하여 서명하기</div>';
+}
+
+// 입력 포맷
+document.getElementById('idnum').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'');
+  if (v.length > 6) v = v.slice(0,6)+'-'+v.slice(6,13);
+  this.value = v;
+});
+document.getElementById('phone').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'');
+  if (v.length > 7) v = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+  else if (v.length > 3) v = v.slice(0,3)+'-'+v.slice(3);
+  this.value = v;
+});
+
+// 제출
+async function submitForm() {
+  if (!validatePage(4)) return;
+
+  const types = Array.from(document.querySelectorAll('#usertype-grid .check-item.checked'))
+    .map(function(el) { return el.querySelector('input').value; }).join(', ') || '미선택';
+
+  const payload = {
+    수신이메일: CENTER_EMAIL,
+    신청일: getTodayStr(),
+    성명: document.getElementById('name').value,
+    성별: gender,
+    주민등록번호: document.getElementById('idnum').value,
+    연락처: document.getElementById('phone').value,
+    주소: document.getElementById('address').value,
+    이용자구분: types,
+    체크리스트: '7/7 항목 모두 확인',
+    개인정보동의: consent[1]==='agree'?'동의함':'동의하지 않음',
+    제3자제공동의: consent[2]==='agree'?'동의함':'동의하지 않음',
+    서명1: sigData[1],
+    서명2: sigData[2],
+  };
+
+  // 완료 화면 먼저 표시
+  buildSummary(payload);
+  document.getElementById('page4').classList.remove('active');
+  document.getElementById('tab4').classList.remove('active');
+  document.getElementById('tab4').classList.add('done');
+  currentPage = 5;
+  document.getElementById('page5').classList.add('active');
+  window.scrollTo(0, 0);
+
+  // 백그라운드 전송
+  document.getElementById('loadingOverlay').classList.add('show');
+  try {
+    const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const result = await res.json();
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('submit-status').innerHTML = result.success
+      ? '<span class="status-badge ok">✅ 구글 시트 저장 완료 · 이메일 발송 완료</span>'
+      : '<span class="status-badge fail">⚠️ 자동 전송 실패 — 출력 후 센터에 제출해 주세요</span>';
+  } catch(e) {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('submit-status').innerHTML = '<span class="status-badge fail">⚠️ 자동 전송 실패 — 출력 후 센터에 제출해 주세요</span>';
+  }
+}
+
+function chk(v) { return v ? '☑' : '☐'; }
+
+function buildSummary(d) {
+  const types = d.이용자구분 || '';
+  document.getElementById('summary-content').innerHTML = `
+  <div class="print-form">
+
+    <!-- ═══ 별첨1: 신청서 ═══ -->
+    <div class="pf-doc">
+      <div class="pf-title">별첨 1 &nbsp; 그냥드림(먹거리 기본보장) 서비스 이용 신청서(개인)</div>
+      <table class="pf-outer">
+        <tr><td colspan="4" class="pf-subtitle">기부식품등 제공사업(그냥드림(먹거리 기본보장)) 서비스 이용신청서(개인)</td></tr>
+        <tr><td colspan="4" class="pf-desc">기부식품등 제공사업(푸드뱅크)은 「식품등 기부 활성화에 관한 법률」에 의거 기업 및 개인으로부터 식품 및 생활용품을 기부받아 도움이 필요한 분들에게 전달해 드리는 사업입니다.</td></tr>
+        <tr>
+          <td class="pf-lbl">성&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;명</td>
+          <td class="pf-val">${d.성명}</td>
+          <td class="pf-lbl">주민등록번호</td>
+          <td class="pf-val">${d.주민등록번호}</td>
+        </tr>
+        <tr>
+          <td class="pf-lbl">연&nbsp;&nbsp;락&nbsp;&nbsp;처</td>
+          <td class="pf-val">${d.연락처}</td>
+          <td class="pf-lbl">성&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;별</td>
+          <td class="pf-val">${d.성별}</td>
+        </tr>
+        <tr>
+          <td class="pf-lbl" colspan="1">주&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;소</td>
+          <td class="pf-val" colspan="3">${d.주소}</td>
+        </tr>
+        <tr>
+          <td class="pf-lbl">이용자 구분</td>
+          <td colspan="3" class="pf-val" style="font-size:11px;">
+            ${chk(types.includes('거주불명등록자'))} 거주불명등록자 &nbsp;
+            ${chk(types.includes('미등록 이주민'))} 미등록 이주민 &nbsp;
+            ${chk(types.includes('신용불량자'))} 신용불량자 &nbsp;
+            ${chk(types.includes('범죄피해자'))} 범죄피해자 &nbsp;
+            ${chk(types.includes('기타 식생활 취약계층'))} 기타 식생활 취약계층
+          </td>
+        </tr>
+      </table>
+
+      <div class="pf-notice-box">
+        <div class="pf-notice-title">유 의 사 항</div>
+        <div class="pf-notice-item">1. 기부식품등 제공사업자(푸드마켓, 푸드뱅크)로부터 제공받은 기부식품 또는 생활용품을 판매하거나 부정한 행위로 사용할 경우 기부식품등 제공이 중지될 수 있습니다.</div>
+        <div class="pf-notice-item">2. 취식 전 반드시 소비기한 및 식품 상태를 확인하고 섭취하여야 한다.</div>
+        <div class="pf-notice-item">3. 개인정보 수집 및 활용 동의
+          <div style="margin-left:12px;">가. 개인정보 활용 목적: 식품기부 종합정보시스템(FMS) 구축·운영에 관한 사무에 활용</div>
+          <div style="margin-left:12px;">나. 보유 및 이용기간: 최종 이용시점 이후 5년 동안 보유 및 이용</div>
+          <div style="margin-left:12px;">다. 개인정보 보유 및 파기: 서비스 이용자격 종료 후 5년 동안 보유 및 이용</div>
+          <div style="margin-left:12px;margin-top:4px;">라. 개인정보 수집 및 이용에 관한 동의<br>
+            「개인정보보호법」 제15조의 규정에 따른 개인정보 수집 및 이용에 동의하십니까?<br>
+            <strong>${chk(d.개인정보동의==='동의함')} 동의함 &nbsp;&nbsp; ${chk(d.개인정보동의!=='동의함')} 동의하지 않음</strong>
+          </div>
+          <div style="margin-left:12px;margin-top:4px;">마. 개인정보의 제3자 제공에 관한 동의<br>
+            <strong>${chk(d.제3자제공동의==='동의함')} 동의함 &nbsp;&nbsp; ${chk(d.제3자제공동의!=='동의함')} 동의하지 않음</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="pf-sign-row">
+        <span>위와 같이 기부식품등 제공사업 지원을 신청합니다.</span>
+        <span class="pf-date">${d.신청일}</span>
+      </div>
+      <div class="pf-sign-row2">
+        <span>신청인</span>
+        <span class="pf-sig-wrap"><img src="${d.서명2}" class="pf-sig-img"></span>
+        <span style="font-size:11px;">(서명 또는 인)</span>
+      </div>
+      <div class="pf-footer">○○푸드뱅크(마켓) 대표 귀하</div>
+    </div>
+
+    <div class="pf-pagebreak"></div>
+
+    <!-- ═══ 별첨2: 체크리스트 ═══ -->
+    <div class="pf-doc">
+      <div class="pf-title">[서식] &nbsp; 그냥드림 서비스 이용자 자가 점검 체크리스트</div>
+      <div class="pf-cl-intro">▪ 그냥드림 사업은 갑작스러운 위기 상황으로 식료품 지원이 절실히 필요한 이웃을 위해 운영됩니다. 그냥드림 사업을 이용하기에 앞서 원활한 사업 운영과 배고픔으로 고통받는 이웃을 위해 아래 항목을 스스로 점검해 주시기 바랍니다.</div>
+      <div class="pf-cl-warn">※ 아래 항목 중 어느 하나라도 해당하지 않을 경우, 서비스 이용이 제한됩니다.</div>
+      <table class="pf-cl-table">
+        <thead>
+          <tr><th style="width:70px;">구분</th><th>점검 항목</th><th style="width:50px;">해당여부</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="4" class="pf-cl-cat">이용자격<br>자가진단</td>
+            <td>1. 현재 실직, 휴업, 폐업, 주택 화재 등으로 인해 경제적 어려움을 겪고 계십니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+          <tr>
+            <td>2. 공공부조(기초생활보장, 긴급복지지원 등) 서비스를 받고 있지 않거나, 받고 있음에도 불구하고 생계가 곤란한 상태에 계십니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+          <tr>
+            <td>3. 당장 식료품이나 생필품을 구매할 여유가 없어 끼니를 거를 위기에 처해 있으십니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+          <tr>
+            <td>4. 본인이나 가구원 중에 돌봐야 할 가족(아동, 노인 등)의 식사가 시급한 상황입니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+          <tr>
+            <td rowspan="3" class="pf-cl-cat">이용<br>에티켓</td>
+            <td>1. 나는 이 물품이 정부 예산과 민간 후원금으로 마련된 소중한 자산임을 인지하고 있습니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+          <tr>
+            <td>2. 나는 나보다 더 어려운 이웃이 물품을 가져가지 못할 수도 있다는 점을 알고 있습니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+          <tr>
+            <td>3. 나의 가족 구성원이 2주 이내에 그냥드림 물품을 수령한 사실이 없습니까?</td>
+            <td class="pf-cl-chk">☑</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pf-cl-bottom">그냥드림 사업은 상황이 어려운 분을 위해 정부 재원과 민간의 후원으로 운영되고 있습니다. 주위의 어려운 분들이 우선 지원받을 수 있도록 적극 협조를 당부드립니다.</div>
+
+      <div class="pf-cl-confirm">본인은 위 내용을 충분히 숙지하였으며, 양심에 따라 그냥드림 서비스를 이용할 것을 확인합니다.</div>
+      <div class="pf-sign-row">
+        <span style="visibility:hidden;">x</span>
+        <span class="pf-date">${d.신청일}</span>
+      </div>
+      <div class="pf-sign-row2">
+        <span>위 본인</span>
+        <span class="pf-sig-wrap"><img src="${d.서명1}" class="pf-sig-img"></span>
+        <span style="font-size:11px;">(서명)</span>
+      </div>
+      <div class="pf-footer">중랑푸드마켓·뱅크센터 귀하</div>
+    </div>
+
+  </div>`;
+}
+
+function resetForm() { if (confirm('새로운 신청서를 작성하시겠습니까?')) location.reload(); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>

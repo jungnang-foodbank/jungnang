@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>그냥드림 관리자 페이지</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Malgun Gothic", sans-serif; background: #f5f5f5; color: #222; }
+.hd { background: #1a6b3c; color: #fff; padding: 18px 24px; }
+.hd h1 { font-size: 18px; font-weight: 700; }
+.hd p { font-size: 12px; opacity: .8; margin-top: 4px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+.lw { display: flex; align-items: center; justify-content: center; min-height: 70vh; }
+.lc { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 360px; box-shadow: 0 2px 12px rgba(0,0,0,.1); text-align: center; }
+.lc h2 { font-size: 18px; color: #1a6b3c; margin-bottom: 8px; }
+.lc p { font-size: 13px; color: #888; margin-bottom: 24px; }
+.lc input { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 12px; text-align: center; letter-spacing: 4px; font-family: inherit; }
+.lc input:focus { outline: none; border-color: #1a6b3c; }
+.btnL { width: 100%; padding: 13px; background: #1a6b3c; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.er { color: #c0392b; font-size: 13px; margin-top: 8px; }
+.aw { display: none; }
+.tb { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+.tb h2 { font-size: 16px; font-weight: 700; }
+.meta { font-size: 13px; color: #888; }
+.btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; font-family: inherit; }
+.bg { background: #1a6b3c; color: #fff; }
+.br { background: #eee; color: #555; }
+.tw { background: #fff; border-radius: 10px; overflow: auto; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+table.list { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px; }
+table.list thead tr { background: #1a6b3c; color: #fff; }
+table.list th { padding: 11px 12px; text-align: left; font-weight: 600; white-space: nowrap; }
+table.list td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+table.list tr:hover td { background: #f9fdf9; }
+.db { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; border: none; cursor: pointer; font-family: inherit; background: #e8f5ee; color: #1a6b3c; }
+.em { text-align: center; padding: 40px; color: #aaa; font-size: 14px; }
+.mo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100; align-items: center; justify-content: center; }
+.mo.op { display: flex; }
+.md { background: #fff; border-radius: 12px; padding: 24px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; }
+.mh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.mh h3 { font-size: 16px; font-weight: 700; color: #1a6b3c; }
+.cx { background: none; border: none; font-size: 22px; cursor: pointer; color: #888; }
+.ma { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+/* ── 원본 양식 스타일 ── */
+.form-sheet { font-family: "Malgun Gothic", sans-serif; font-size: 10pt; }
+.form1-title { font-size: 14pt; font-weight: 700; margin-bottom: 10px; }
+.form1-box { border: 1px solid #000; margin-bottom: 12px; }
+.form1-header { background: #f0f0f0; text-align: center; font-weight: 700; font-size: 11pt; padding: 6px; border-bottom: 1px solid #000; }
+.form1-desc { font-size: 9.5pt; line-height: 1.6; padding: 6px 8px; border-bottom: 1px solid #000; }
+.form1-row { display: flex; border-bottom: 1px solid #000; }
+.form1-row:last-child { border-bottom: none; }
+.form1-label { background: #f5f5f5; font-weight: 700; padding: 6px 10px; border-right: 1px solid #000; min-width: 85px; display: flex; align-items: center; font-size: 10pt; white-space: nowrap; }
+.form1-val { padding: 6px 10px; flex: 1; display: flex; align-items: center; font-size: 10pt; }
+.form1-val.border-right { border-right: 1px solid #000; }
+.notice-wrap { border: 1px solid #000; padding: 8px 10px; margin-bottom: 10px; font-size: 9.5pt; line-height: 1.8; }
+.notice-title { font-weight: 700; margin-bottom: 4px; }
+.notice-indent { margin-left: 16px; }
+.sign-section { margin: 12px 0 6px; }
+.sign-line1 { font-size: 10pt; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.sign-line2 { display: flex; align-items: center; gap: 12px; font-size: 10pt; margin-bottom: 6px; }
+.sig-img-wrap { border-bottom: 1px solid #000; min-width: 130px; text-align: center; padding: 2px 4px; }
+.sig-img-wrap img { height: 50px; max-width: 160px; display: block; margin: 0 auto; }
+.form-footer { text-align: right; font-weight: 700; font-size: 10pt; margin-top: 6px; }
+.page-divider { border-top: 2px dashed #aaa; margin: 20px 0; }
+.form2-title { font-size: 14pt; font-weight: 700; margin-bottom: 14px; }
+.cl-intro { font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
+.cl-warn { font-size: 10pt; font-weight: 700; text-decoration: underline; margin-bottom: 10px; }
+table.cl { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10pt; }
+table.cl th { border: 1px solid #000; padding: 6px 8px; background: #f0f0f0; font-weight: 700; text-align: center; }
+table.cl td { border: 1px solid #000; padding: 6px 10px; vertical-align: middle; line-height: 1.5; }
+table.cl .cat { text-align: center; font-weight: 700; background: #fafafa; font-size: 9.5pt; }
+table.cl .chk { text-align: center; font-size: 14pt; }
+.cl-note { border: 1px solid #000; padding: 8px 10px; font-size: 10pt; line-height: 1.6; margin-bottom: 14px; }
+.cl-confirm { font-size: 12pt; font-weight: 700; text-align: center; margin: 16px 0 14px; line-height: 1.6; }
+
+@media print {
+  .hd, .tb, .tw, .ma, .cx, .no-print { display: none !important; }
+  .mo { position: static; background: none; display: block !important; }
+  .md { box-shadow: none; padding: 0; max-height: none; border-radius: 0; }
+  .wrap { padding: 0; }
+  .page-divider { page-break-after: always; border: none; }
+  .form-sheet { padding: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <h1>그냥드림 관리자 페이지</h1>
+  <p>중랑푸드마켓·뱅크센터</p>
+</div>
+
+<div class="wrap">
+  <div class="lw" id="lw">
+    <div class="lc">
+      <h2>🔒 관리자 로그인</h2>
+      <p>비밀번호를 입력해 주세요</p>
+      <input type="password" id="pw" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()">
+      <button class="btnL" onclick="login()">로그인</button>
+      <div class="er" id="er"></div>
+    </div>
+  </div>
+
+  <div class="aw" id="aw">
+    <div class="tb">
+      <div>
+        <h2>📋 신청자 목록</h2>
+        <div class="meta" id="mc"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn br no-print" onclick="loadData()">🔄 새로고침</button>
+        <button class="btn bg no-print" onclick="pAll()">🖨️ 전체 인쇄</button>
+      </div>
+    </div>
+    <div class="tw">
+      <table class="list">
+        <thead>
+          <tr><th>#</th><th>신청일</th><th>성명</th><th>연락처</th><th>이용자구분</th><th>동의</th><th>관리</th></tr>
+        </thead>
+        <tbody id="tb">
+          <tr><td colspan="7" class="em">로그인 후 불러옵니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo">
+  <div class="md">
+    <div class="mh no-print">
+      <h3 id="mt">미리보기</h3>
+      <button class="cx" onclick="cm()">✕</button>
+    </div>
+    <div class="ma no-print">
+      <button class="btn bg" onclick="window.print()">🖨️ 인쇄하기</button>
+    </div>
+    <div class="form-sheet" id="mc2"></div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpLY2QWm8_UMXlO62xxJ3S_0xHMXKcU_STLY3EyHgm1vnl69Rnd_mXxyQCm4o4Izr7Fg/exec';
+const ADMIN_PW = 'jungnang2026';
+let D = [], CR = null;
+
+function login() {
+  const pw = document.getElementById('pw').value;
+  if (!pw) { document.getElementById('er').textContent = '비밀번호를 입력해 주세요'; return; }
+  if (pw !== ADMIN_PW) { document.getElementById('er').textContent = '비밀번호가 틀렸습니다'; return; }
+  document.getElementById('lw').style.display = 'none';
+  document.getElementById('aw').style.display = 'block';
+  loadData();
+}
+
+function loadData() {
+  document.getElementById('tb').innerHTML = '<tr><td colspan="7" class="em">불러오는 중...</td></tr>';
+  fetch(SCRIPT_URL + '?action=getData&pw=' + encodeURIComponent(ADMIN_PW))
+    .then(r => r.json())
+    .then(res => {
+      if (!res.success) { alert('오류: ' + (res.error||'')); return; }
+      D = res.rows || [];
+      render();
+    })
+    .catch(e => alert('오류: ' + e.message));
+}
+
+function render() {
+  document.getElementById('mc').textContent = '총 ' + D.length + '명';
+  const tb = document.getElementById('tb');
+  if (!D.length) { tb.innerHTML = '<tr><td colspan="7" class="em">신청자가 없습니다</td></tr>'; return; }
+  tb.innerHTML = D.map((r,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r['신청일']||''}</td>
+      <td><strong>${r['성명']||''}</strong></td>
+      <td>${r['연락처']||''}</td>
+      <td>${r['이용자구분']||'-'}</td>
+      <td style="font-size:11px;">${r['개인정보동의']==='동의함'?'✅':'❌'} 개인정보<br>${r['제3자제공동의']==='동의함'?'✅':'❌'} 제3자</td>
+      <td><button class="db" onclick="om(${i})">미리보기 / 인쇄</button></td>
+    </tr>`).join('');
+}
+
+function chk(v) { return v ? '☑' : '☐'; }
+
+function fmtDate(v) {
+  if (!v) return '';
+  if (typeof v === 'string' && v.indexOf('년') > -1) return v;
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return String(v);
+  return d.getFullYear() + '년 ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일';
+}
+
+function getSigHtml(url) {
+  if (!url || url.trim() === '') return '<span style="display:inline-block;min-width:130px;">&nbsp;</span>';
+  if (url.indexOf('drive.google.com') > -1 || url.indexOf('http') === 0) {
+    return `<img src="${url}" style="height:50px;max-width:160px;display:block;margin:0 auto;" onerror="this.outerHTML='<span style=color:#c0392b;font-size:9pt>[서명이미지 로딩 실패 - 새로고침 해주세요]</span>'">`;
+  }
+  // base64 이미지인 경우 (구형 데이터)
+  if (url.indexOf('data:image') === 0) {
+    return `<img src="${url}" style="height:50px;max-width:160px;display:block;margin:0 auto;">`;
+  }
+  return '<span style="display:inline-block;min-width:130px;">&nbsp;</span>';
+}
+
+function buildForm(d) {
+  const t = d['이용자구분'] || '';
+  const name = d['성명'] || '';
+  const date = fmtDate(d['신청일']);
+  // 시트 헤더가 '서명1(URL)' 또는 '서명1' 둘 다 대응
+  const s1url = d['서명1(URL)'] || d['서명1'] || '';
+  const s2url = d['서명2(URL)'] || d['서명2'] || '';
+
+  return `
+  <div class="form1-title">별첨 1 &nbsp; <span style="font-size:11pt;font-weight:400;">그냥드림(먹거리 기본보장) 서비스 이용 신청서(개인)</span></div>
+  <div class="form1-box">
+    <div class="form1-header">기부식품등 제공사업(그냥드림(먹거리 기본보장)) 서비스 이용신청서(개인)</div>
+    <div class="form1-desc">기부식품등 제공사업(푸드뱅크)은 「식품등 기부 활성화에 관한 법률」에 의거 기업 및 개인으로부터 식품 및 생활용품을 기부받아 도움이 필요한 분들에게 전달해 드리는 사업입니다.</div>
+    <div class="form1-row">
+      <div class="form1-label">성&nbsp;&nbsp;&nbsp;&nbsp;명</div><div class="form1-val border-right">${name}</div>
+      <div class="form1-label">주민등록번호</div><div class="form1-val">${d['주민등록번호']||''}</div>
+    </div>
+    <div class="form1-row">
+      <div class="form1-label">연&nbsp;&nbsp;락&nbsp;&nbsp;처</div><div class="form1-val border-right">${d['연락처']||''}</div>
+      <div class="form1-label">성&nbsp;&nbsp;&nbsp;&nbsp;별</div><div class="form1-val">${d['성별']||''}</div>
+    </div>
+    <div class="form1-row">
+      <div class="form1-label">주&nbsp;&nbsp;&nbsp;&nbsp;소</div><div class="form1-val">${d['주소']||''}</div>
+    </div>
+    <div class="form1-row">
+      <div class="form1-label">이용자 구분</div>
+      <div class="form1-val" style="flex-wrap:wrap;gap:4px;">
+        ${chk(t.includes('거주불명등록자'))} 거주불명등록자 &nbsp;
+        ${chk(t.includes('미등록 이주민'))} 미등록 이주민 &nbsp;
+        ${chk(t.includes('신용불량자'))} 신용불량자 &nbsp;
+        ${chk(t.includes('범죄피해자'))} 범죄피해자 &nbsp;
+        ${chk(t.includes('기타 식생활 취약계층'))} 기타 식생활 취약계층
+      </div>
+    </div>
+  </div>
+
+  <div class="notice-wrap">
+    <div class="notice-title">유 의 사 항</div>
+    <div>1. 기부식품등 제공사업자(푸드마켓, 푸드뱅크)로부터 제공받은 기부식품 또는 생활용품을 판매하거나 부정한 행위로 사용할 경우 기부식품등 제공이 중지될 수 있습니다.</div>
+    <div>2. 취식 전 반드시 소비기한 및 식품 상태를 확인하고 섭취하여야 한다.</div>
+    <div>3. 개인정보 수집 및 활용 동의</div>
+    <div class="notice-indent">가. 개인정보 활용 목적: 식품기부 종합정보시스템(FMS) 구축·운영에 관한 사무에 활용</div>
+    <div class="notice-indent">나. 보유 및 이용기간: 최종 이용시점 이후 5년 동안 보유 및 이용</div>
+    <div class="notice-indent">라. 개인정보 수집 및 이용에 관한 동의<br>
+      「개인정보보호법」 제15조의 규정에 따른 개인정보 수집 및 이용에 동의하십니까?<br>
+      <strong>${chk(d['개인정보동의']==='동의함')} 동의함 &nbsp;&nbsp;&nbsp; ${chk(d['개인정보동의']!=='동의함')} 동의하지 않음</strong>
+    </div>
+    <div class="notice-indent">마. 개인정보의 제3자 제공에 관한 동의<br>
+      <strong>${chk(d['제3자제공동의']==='동의함')} 동의함 &nbsp;&nbsp;&nbsp; ${chk(d['제3자제공동의']!=='동의함')} 동의하지 않음</strong>
+    </div>
+  </div>
+
+  <div class="sign-section">
+    <div class="sign-line1">
+      <span>위와 같이 기부식품등 제공사업 지원을 신청합니다.</span>
+      <span><strong>${date}</strong></span>
+    </div>
+    <div class="sign-line2">
+      <span>신청인 &nbsp; <strong>${name}</strong></span>
+      <span class="sig-img-wrap">${getSigHtml(s2url)}</span>
+      <span style="font-size:9.5pt;">(서명 또는 인)</span>
+    </div>
+    <div class="form-footer">중랑푸드마켓·뱅크센터 귀하</div>
+  </div>
+
+  <div class="page-divider"></div>
+
+  <div class="form2-title">[서식] &nbsp; 그냥드림 서비스 이용자 자가 점검 체크리스트</div>
+  <div class="cl-intro">▪ 그냥드림 사업은 갑작스러운 위기 상황으로 식료품 지원이 절실히 필요한 이웃을 위해 운영됩니다. 그냥드림 사업을 이용하기에 앞서 원활한 사업 운영과 배고픔으로 고통받는 이웃을 위해 아래 항목을 스스로 점검해 주시기 바랍니다.</div>
+  <div class="cl-warn">※ 아래 항목 중 어느 하나라도 해당하지 않을 경우, 서비스 이용이 제한됩니다.</div>
+  <table class="cl">
+    <thead><tr><th style="width:70px;">구분</th><th>점검 항목</th><th style="width:55px;">해당여부</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="4" class="cat">이용자격<br>자가진단</td><td>1. 현재 실직, 휴업, 폐업, 주택 화재 등으로 인해 경제적 어려움을 겪고 계십니까?</td><td class="chk">☑</td></tr>
+      <tr><td>2. 공공부조(기초생활보장, 긴급복지지원 등) 서비스를 받고 있지 않거나, 받고 있음에도 불구하고 생계가 곤란한 상태에 계십니까?</td><td class="chk">☑</td></tr>
+      <tr><td>3. 당장 식료품이나 생필품을 구매할 여유가 없어 끼니를 거를 위기에 처해 있으십니까?</td><td class="chk">☑</td></tr>
+      <tr><td>4. 본인이나 가구원 중에 돌봐야 할 가족(아동, 노인 등)의 식사가 시급한 상황입니까?</td><td class="chk">☑</td></tr>
+      <tr><td rowspan="3" class="cat">이용<br>에티켓</td><td>1. 나는 이 물품이 정부 예산과 민간 후원금으로 마련된 소중한 자산임을 인지하고 있습니까?</td><td class="chk">☑</td></tr>
+      <tr><td>2. 나는 나보다 더 어려운 이웃이 물품을 가져가지 못할 수도 있다는 점을 알고 있습니까?</td><td class="chk">☑</td></tr>
+      <tr><td>3. 나의 가족 구성원이 2주 이내에 그냥드림 물품을 수령한 사실이 없습니까?</td><td class="chk">☑</td></tr>
+    </tbody>
+  </table>
+  <div class="cl-note">그냥드림 사업은 상황이 어려운 분을 위해 정부 재원과 민간의 후원으로 운영되고 있습니다. 주위의 어려운 분들이 우선 지원받을 수 있도록 적극 협조를 당부드립니다.</div>
+  <div class="cl-confirm">본인은 위 내용을 충분히 숙지하였으며, 양심에 따라 그냥드림<br>서비스를 이용할 것을 확인합니다.</div>
+  <div class="sign-section">
+    <div class="sign-line1">
+      <span></span>
+      <span><strong>${date}</strong></span>
+    </div>
+    <div class="sign-line2">
+      <span>위 본인 &nbsp; <strong>${name}</strong></span>
+      <span class="sig-img-wrap">${getSigHtml(s1url)}</span>
+      <span style="font-size:9.5pt;">(서명)</span>
+    </div>
+    <div class="form-footer">중랑푸드마켓·뱅크센터 귀하</div>
+  </div>`;
+}
+
+function om(i) {
+  CR = D[i];
+  document.getElementById('mt').textContent = (CR['성명']||'') + ' 신청서';
+  document.getElementById('mc2').innerHTML = buildForm(CR);
+  document.getElementById('mo').classList.add('op');
+}
+
+function cm() { document.getElementById('mo').classList.remove('op'); }
+
+const PRINT_CSS = `
+  body{font-family:"Malgun Gothic",sans-serif;font-size:10pt;margin:20px}
+  .form1-title{font-size:14pt;font-weight:700;margin-bottom:10px}
+  .form1-box{border:1px solid #000;margin-bottom:12px}
+  .form1-header{background:#f0f0f0;text-align:center;font-weight:700;font-size:11pt;padding:6px;border-bottom:1px solid #000}
+  .form1-desc{font-size:9.5pt;line-height:1.6;padding:6px 8px;border-bottom:1px solid #000}
+  .form1-row{display:flex;border-bottom:1px solid #000}
+  .form1-row:last-child{border-bottom:none}
+  .form1-label{background:#f5f5f5;font-weight:700;padding:6px 10px;border-right:1px solid #000;min-width:85px;display:flex;align-items:center;white-space:nowrap}
+  .form1-val{padding:6px 10px;flex:1;display:flex;align-items:center}
+  .form1-val.border-right{border-right:1px solid #000}
+  .notice-wrap{border:1px solid #000;padding:8px 10px;margin-bottom:10px;font-size:9.5pt;line-height:1.8}
+  .notice-title{font-weight:700;margin-bottom:4px}
+  .notice-indent{margin-left:16px}
+  .sign-section{margin:12px 0 6px}
+  .sign-line1{font-size:10pt;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .sign-line2{display:flex;align-items:center;gap:12px;font-size:10pt;margin-bottom:6px}
+  .sig-img-wrap{border-bottom:1px solid #000;min-width:130px;text-align:center;padding:2px 4px}
+  .sig-img-wrap img{height:50px;max-width:160px;display:block;margin:0 auto}
+  .form-footer{text-align:right;font-weight:700;font-size:10pt;margin-top:6px}
+  .page-divider{page-break-after:always}
+  .form2-title{font-size:14pt;font-weight:700;margin-bottom:14px}
+  .cl-intro{font-size:10pt;line-height:1.7;margin-bottom:14px}
+  .cl-warn{font-size:10pt;font-weight:700;text-decoration:underline;margin-bottom:10px}
+  table.cl{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:10pt}
+  table.cl th{border:1px solid #000;padding:6px 8px;background:#f0f0f0;font-weight:700;text-align:center}
+  table.cl td{border:1px solid #000;padding:6px 10px;vertical-align:middle;line-height:1.5}
+  .cat{text-align:center;font-weight:700;background:#fafafa;font-size:9.5pt}
+  .chk{text-align:center;font-size:14pt}
+  .cl-note{border:1px solid #000;padding:8px 10px;font-size:10pt;line-height:1.6;margin-bottom:14px}
+  .cl-confirm{font-size:12pt;font-weight:700;text-align:center;margin:16px 0 14px;line-height:1.6}
+`;
+
+function pAll() {
+  if (!D.length) { alert('신청자가 없습니다'); return; }
+  if (!confirm(D.length + '명 전체를 인쇄합니다. 계속하시겠습니까?')) return;
+  const allHtml = D.map(d => buildForm(d)).join('<div style="page-break-after:always"></div>');
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PRINT_CSS}</style></head><body>${allHtml}<script>window.onload=function(){window.print();}<\/script></body></html>`);
+  w.document.close();
+}
+</script>
+</body>
+</html>
